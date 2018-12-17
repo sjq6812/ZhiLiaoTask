@@ -52,7 +52,27 @@ public class AddSendActivity extends AppCompatActivity {
             } else if (mAdapter.getUserList().isEmpty()) {
                 Toast.makeText(this, "发送人不能为空", Toast.LENGTH_SHORT).show();
             } else {
-                mMutationThread.start();
+                new Thread(() -> {
+                    mMutation = SetMessageSendMutation.builder()
+                            .title(mAddTitle.getText().toString())
+                            .content(mAddContent.getText().toString())
+                            .sendUserId(UserUtils.getUserId(this))
+                            .receiverUserIdArr(mAdapter.getUserList())
+                            .build();
+                    mMutationApolloCall = mApplication.getApolloClient().mutate(mMutation);
+                    mMutationApolloCall.enqueue(new ApolloCall.Callback<SetMessageSendMutation.Data>() {
+                        @Override
+                        public void onResponse(@NotNull Response<SetMessageSendMutation.Data> response) {
+                            runOnUiThread(()-> Toast.makeText(mApplication, "发送成功", Toast.LENGTH_SHORT).show());
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(@NotNull ApolloException e) {
+                            runOnUiThread(()-> Toast.makeText(mApplication, "发送失败", Toast.LENGTH_SHORT).show());
+                        }
+                    });
+                }).start();
             }
 
         });
@@ -66,7 +86,21 @@ public class AddSendActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        mQueryThread.start();
+        new Thread(() -> {
+            mQuery = GetUserListQuery.builder().build();
+            mQueryApolloCall = mApplication.getApolloClient().query(mQuery);
+            mQueryApolloCall.enqueue(new ApolloCall.Callback<GetUserListQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetUserListQuery.Data> response) {
+                    mAdapter.getList(response.data().UserList().content());
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                }
+            });
+
+        }).start();
     }
 
     private void initView() {
@@ -78,44 +112,6 @@ public class AddSendActivity extends AppCompatActivity {
         mListView.setAdapter(mAdapter);
         mApplication = (ZhiLiaoApplication) getApplication();
     }
-
-    Thread mQueryThread = new Thread(() -> {
-        mQuery = GetUserListQuery.builder().build();
-        mQueryApolloCall = mApplication.getApolloClient().query(mQuery);
-        mQueryApolloCall.enqueue(new ApolloCall.Callback<GetUserListQuery.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<GetUserListQuery.Data> response) {
-                mAdapter.getList(response.data().UserList().content());
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-            }
-        });
-
-    });
-
-    Thread mMutationThread = new Thread(() -> {
-        mMutation = SetMessageSendMutation.builder()
-                .title(mAddTitle.getText().toString())
-                .content(mAddContent.getText().toString())
-                .sendUserId(UserUtils.getUserId(this))
-                .receiverUserIdArr(mAdapter.getUserList())
-                .build();
-        mMutationApolloCall = mApplication.getApolloClient().mutate(mMutation);
-        mMutationApolloCall.enqueue(new ApolloCall.Callback<SetMessageSendMutation.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<SetMessageSendMutation.Data> response) {
-                    runOnUiThread(()-> Toast.makeText(mApplication, "发送成功", Toast.LENGTH_SHORT).show());
-                    finish();
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-                runOnUiThread(()-> Toast.makeText(mApplication, "发送失败", Toast.LENGTH_SHORT).show());
-            }
-        });
-    });
 
     /**
      *左上角返回点击

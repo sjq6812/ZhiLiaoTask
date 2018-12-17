@@ -46,7 +46,39 @@ public class SendActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        thread.start();
+        new Thread(()->{
+            mQuery = GetReceiversByMessageIdQuery.builder()
+                    .id(mMessageId)
+                    .build();
+            mCall = mApplication.getApolloClient().query(mQuery);
+            mCall.enqueue(new ApolloCall.Callback<GetReceiversByMessageIdQuery.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<GetReceiversByMessageIdQuery.Data> response) {
+                    GetReceiversByMessageIdQuery.Message message = response.data().Message();
+                    runOnUiThread(()->{
+                        mAdapter.getList(message.receivers());
+                        mSendTitle.setText(message.title());
+                        mSendContent.setText(message.content());
+                        int readNum = 0;
+                        int unReadNum = 0;
+                        for (int j = 0; j <message.receivers().size(); j++) {
+                            if (message.receivers().get(j).readed()) {
+                                readNum++;
+                            } else {
+                                unReadNum++;
+                            }
+                        }
+                        mSendReadCount.setText(String.valueOf(readNum));
+                        mSendUnreadCount.setText(String.valueOf(unReadNum));
+                    });
+                }
+
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    Log.d("===========", e.toString());
+                }
+            });
+        }).start();
     }
 
     private void initTitle(String title) {
@@ -55,40 +87,6 @@ public class SendActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(title);
     }
-
-    Thread thread=new Thread(()->{
-        mQuery = GetReceiversByMessageIdQuery.builder()
-                .id(mMessageId)
-                .build();
-        mCall = mApplication.getApolloClient().query(mQuery);
-        mCall.enqueue(new ApolloCall.Callback<GetReceiversByMessageIdQuery.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<GetReceiversByMessageIdQuery.Data> response) {
-                GetReceiversByMessageIdQuery.Message message = response.data().Message();
-                mAdapter.getList(message.receivers());
-                runOnUiThread(()->{
-                    mSendTitle.setText(message.title());
-                    mSendContent.setText(message.content());
-                    int readNum = 0;
-                    int unReadNum = 0;
-                    for (int j = 0; j <message.receivers().size(); j++) {
-                        if (message.receivers().get(j).readed()) {
-                            readNum++;
-                        } else {
-                            unReadNum++;
-                        }
-                    }
-                    mSendReadCount.setText(String.valueOf(readNum));
-                    mSendUnreadCount.setText(String.valueOf(unReadNum));
-                });
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-                Log.d("===========", e.toString());
-            }
-        });
-    });
 
     private void initView() {
         mSendTitle = findViewById(R.id.send_title);

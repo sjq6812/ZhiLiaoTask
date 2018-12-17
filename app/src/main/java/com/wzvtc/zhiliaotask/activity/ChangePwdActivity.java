@@ -40,7 +40,24 @@ public class ChangePwdActivity extends AppCompatActivity {
             mNewPwdCheck = mChangePwdEditPwdCheck.getText().toString().trim();
             if (!TextUtils.isEmpty(mNewPwd) && !TextUtils.isEmpty(mNewPwdCheck)) {
                 if (mNewPwd.equals(mNewPwdCheck)) {
-                    mThread.start();
+                    new Thread(()->{
+                        mMutation = ModifyPasswordMutation.builder()
+                                .id(UserUtils.getUserId(this))
+                                .password(mNewPwdCheck)
+                                .build();
+                        mCall = ZhiLiaoApplication.getInstance().getApolloClient().mutate(mMutation);
+                        mCall.enqueue(new ApolloCall.Callback<ModifyPasswordMutation.Data>() {
+                            @Override
+                            public void onResponse(@NotNull Response<ModifyPasswordMutation.Data> response) {
+                                runOnUiThread(() -> Toast.makeText(ChangePwdActivity.this, "修改成功", Toast.LENGTH_SHORT).show());
+                                finish();
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull ApolloException e) {
+                            }
+                        });
+                    }).start();
                 } else {
                     Toast.makeText(this, "两次密码不一致", Toast.LENGTH_SHORT).show();
                 }
@@ -76,25 +93,6 @@ public class ChangePwdActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    Thread mThread=new Thread(()->{
-        mMutation = ModifyPasswordMutation.builder()
-                .id(UserUtils.getUserId(this))
-                .password(mNewPwdCheck)
-                .build();
-        mCall = ZhiLiaoApplication.getInstance().getApolloClient().mutate(mMutation);
-        mCall.enqueue(new ApolloCall.Callback<ModifyPasswordMutation.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<ModifyPasswordMutation.Data> response) {
-                runOnUiThread(() -> Toast.makeText(ChangePwdActivity.this, "修改成功", Toast.LENGTH_SHORT).show());
-                finish();
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-            }
-        });
-    });
 
     @Override
     protected void onDestroy() {

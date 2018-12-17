@@ -43,14 +43,28 @@ public class ReceiveActivity extends AppCompatActivity {
 
         messageId = intent.getStringExtra(Const.MESSAGE_ID);
 
-        mSetRemind.setOnClickListener(v -> {
-            Toast.makeText(this, "此功能正在测试中", Toast.LENGTH_SHORT).show();
-        });
+        mSetRemind.setOnClickListener(v -> Toast.makeText(this, "此功能正在测试中", Toast.LENGTH_SHORT).show());
 
-        mSetRead.setOnClickListener(v ->{
+        mSetRead.setOnClickListener(v -> new Thread(()->{
+            SetUserReadedMutation setUserReadedMutation = SetUserReadedMutation.builder()
+                    .messageId(messageId)
+                    .userId(UserUtils.getUserId(this))
+                    .build();
+            mCall = mApplication.getApolloClient().mutate(setUserReadedMutation);
+            mCall.enqueue(new ApolloCall.Callback<SetUserReadedMutation.Data>() {
+                @Override
+                public void onResponse(@NotNull Response<SetUserReadedMutation.Data> response) {
+                    if (response.data().messages_userReaded()) {
+                        runOnUiThread(() -> Toast.makeText(ReceiveActivity.this, "已读", Toast.LENGTH_SHORT).show());
+                    }
+                }
 
-            mThread.start();
-        });
+                @Override
+                public void onFailure(@NotNull ApolloException e) {
+                    Log.d("-------", "onFailure: "+e.toString());
+                }
+            });
+        }).start());
 
     }
 
@@ -61,26 +75,6 @@ public class ReceiveActivity extends AppCompatActivity {
         actionBar.setTitle(intent.getStringExtra(Const.SEND_NAME));
     }
 
-    Thread mThread=new Thread(()->{
-        SetUserReadedMutation setUserReadedMutation = SetUserReadedMutation.builder()
-                .messageId(messageId)
-                .userId(UserUtils.getUserId(this))
-                .build();
-        mCall = mApplication.getApolloClient().mutate(setUserReadedMutation);
-        mCall.enqueue(new ApolloCall.Callback<SetUserReadedMutation.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<SetUserReadedMutation.Data> response) {
-                if (response.data().messages_userReaded()) {
-                    runOnUiThread(() -> Toast.makeText(ReceiveActivity.this, "已读", Toast.LENGTH_SHORT).show());
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-                Log.d("-------", "onFailure: "+e.toString());
-            }
-        });
-    });
 
     private void initView() {
         mReceiveTitle = findViewById(R.id.receive_title);

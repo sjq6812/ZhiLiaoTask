@@ -3,10 +3,10 @@ package com.wzvtc.zhiliaotask.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -43,11 +43,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         initView();
         initTitle("用户登录");
-        Intent intent = getIntent();
-        if (intent != null) {
-            mLoginEditAccount.setText(intent.getStringExtra(Const.USER_PHONE));
-            mLoginEditPwd.setText(intent.getStringExtra(Const.USER_PWD));
-        }
         mLoginBtnLogin.setOnClickListener(v -> {
             mAccount = mLoginEditAccount.getText().toString().trim();
             mPassword = mLoginEditPwd.getText().toString().trim();
@@ -59,8 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         mLoginBtnRegister.setOnClickListener(v -> {
-            startActivity(new Intent(this, RegisterActivity.class));
-            finish();
+            startActivityForResult(new Intent(this, RegisterActivity.class), 1);
         });
 
     }
@@ -74,12 +68,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initTitle(String title) {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(title);
     }
-
-
 
     Thread mLoginThread = new Thread(() -> {
         mOkHttpClient = new OkHttpClient();
@@ -122,17 +112,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     });
 
-
-    /**
-     *左上角返回点击
-     */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 1:
+                if (resultCode == RESULT_OK) {
+                        mLoginEditAccount.setText(data.getStringExtra(Const.USER_PHONE));
+                        mLoginEditPwd.setText(data.getStringExtra(Const.USER_PWD));
+                }
+                break;
+            default:
+                break;
         }
-        return super.onOptionsItemSelected(item);
     }
-
 }

@@ -40,7 +40,24 @@ public class ChangePhoneActivity extends AppCompatActivity{
             mNewPhoneCheck = mChangePhoneEditPwdCheck.getText().toString().trim();
             if (!TextUtils.isEmpty(mNewPhone) && !TextUtils.isEmpty(mNewPhoneCheck)) {
                 if (mNewPhone.equals(mNewPhoneCheck)) {
-                    mThread.start();
+                    new Thread(()->{
+                        mMutation = ModifyPhoneMutation.builder()
+                                .userId(UserUtils.getUserId(this))
+                                .phone(mNewPhoneCheck)
+                                .build();
+                        mCall = ZhiLiaoApplication.getInstance().getApolloClient().mutate(mMutation);
+                        mCall.enqueue(new ApolloCall.Callback<ModifyPhoneMutation.Data>() {
+                            @Override
+                            public void onResponse(@NotNull Response<ModifyPhoneMutation.Data> response) {
+                                runOnUiThread(() -> Toast.makeText(ChangePhoneActivity.this, "修改成功", Toast.LENGTH_SHORT).show());
+                                finish();
+                            }
+
+                            @Override
+                            public void onFailure(@NotNull ApolloException e) {
+                            }
+                        });
+                    }).start();
                 } else {
                     Toast.makeText(this, "两次号码不一致", Toast.LENGTH_SHORT).show();
                 }
@@ -78,24 +95,6 @@ public class ChangePhoneActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    Thread mThread=new Thread(()->{
-        mMutation = ModifyPhoneMutation.builder()
-                .userId(UserUtils.getUserId(this))
-                .phone(mNewPhoneCheck)
-                .build();
-        mCall = ZhiLiaoApplication.getInstance().getApolloClient().mutate(mMutation);
-        mCall.enqueue(new ApolloCall.Callback<ModifyPhoneMutation.Data>() {
-            @Override
-            public void onResponse(@NotNull Response<ModifyPhoneMutation.Data> response) {
-                runOnUiThread(() -> Toast.makeText(ChangePhoneActivity.this, "修改成功", Toast.LENGTH_SHORT).show());
-                finish();
-            }
-
-            @Override
-            public void onFailure(@NotNull ApolloException e) {
-            }
-        });
-    });
 
     @Override
     protected void onDestroy() {

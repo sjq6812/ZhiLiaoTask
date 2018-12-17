@@ -44,10 +44,10 @@ public class RegisterActivity extends AppCompatActivity {
             mPhone = mRegisterEditPhone.getText().toString().trim();
             mPassword = mRegisterEditPwd.getText().toString().trim();
             if (!TextUtils.isEmpty(mNickName) && !TextUtils.isEmpty(mPhone) && !TextUtils.isEmpty(mPassword)) {
-                if (mPassword.length() < 6 || mPassword.length() > 11) {
-                    Toast.makeText(this, "电话必须在6-11位", Toast.LENGTH_SHORT).show();
-                } else {
+                if (mPhone.length() >= 6 && mPhone.length() <= 11) {
                     mThread.start();
+                } else {
+                    Toast.makeText(this, "电话必须在6-11位", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, "请填写完整资料", Toast.LENGTH_SHORT).show();
@@ -89,10 +89,10 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Response<RegisterUserMutation.Data> response) {
                 runOnUiThread(() -> Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show());
-                mIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+                mIntent = new Intent();
                 mIntent.putExtra(Const.USER_PHONE, mPhone);
                 mIntent.putExtra(Const.USER_PWD, mPassword);
-                startActivity(mIntent);
+                setResult(RESULT_OK, mIntent);
                 finish();
             }
 
@@ -114,6 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -121,5 +122,6 @@ public class RegisterActivity extends AppCompatActivity {
             mCall.cancel();
         }
     }
+
 
 }

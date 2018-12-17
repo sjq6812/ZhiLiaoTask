@@ -42,12 +42,12 @@ public class MineFragment extends Fragment{
         mResetPhone.setOnClickListener(v -> startActivity(new Intent(getActivity(),ChangePhoneActivity.class)));
 
         mExitLogin.setOnClickListener(v -> {
-            // TODO: 2018/12/15 0015 由于对登录没啥限制退出登录就不走网络请求了
             startActivity(new Intent(getActivity(), LoginActivity.class));
             mApplication.setIsLogin(0);
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.clear();
             editor.apply();
+            getActivity().finish();
         });
 
         return mView;
