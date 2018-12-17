@@ -25,6 +25,9 @@ import com.wzvtc.zhiliaotask.utils.UserUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * created by Litrainy on 2018-12-03 18:45
  */
@@ -47,7 +50,8 @@ public class ReceiveFragment extends Fragment {
 
         initView();
         initData();
-        mSwipeRefreshLayout.setOnRefreshListener(this::initData);
+        refresh();
+        mSwipeRefreshLayout.setOnRefreshListener(this::refresh);
 
         return mView;
     }
@@ -60,36 +64,23 @@ public class ReceiveFragment extends Fragment {
         mAdapter = new ReceiveRvAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
         mApplication = (ZhiLiaoApplication) getActivity().getApplication();
+
     }
+
 
     private void initData() {
-        new Thread(() -> {
-            mQuery = GetReceiveMessageListQuery.builder()
-                    .qfilter(Qfilter.builder()
-                            .key("receivers.user.id")
-                            .operator(QueryFilterOperator.EQUEAL)
-                            .value(UserUtils.getUserId(getActivity()))
-                            .build())
-                    .build();
-            mCall = mApplication.getApolloClient().query(mQuery);
-            mCall.enqueue(new ApolloCall.Callback<GetReceiveMessageListQuery.Data>() {
-                @Override
-                public void onResponse(@NotNull Response<GetReceiveMessageListQuery.Data> response) {
-                    getActivity().runOnUiThread(() -> {
-                        mAdapter.getList(response.data().MessageList().content());
-                        mSwipeRefreshLayout.setRefreshing(false);
-                    });
-                }
-
-                @Override
-                public void onFailure(@NotNull ApolloException e) {
-                    Log.d("=============: ", e.toString());
-                }
-            });
-        }).start();
-
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                query();
+            }
+        }, 5000);
     }
 
+    public void refresh() {
+        new Thread(this::query).start();
+    }
 
     @Override
     public void onDestroyView() {
@@ -99,5 +90,29 @@ public class ReceiveFragment extends Fragment {
         }
     }
 
+    public void query(){
+        mQuery = GetReceiveMessageListQuery.builder()
+                .qfilter(Qfilter.builder()
+                        .key("receivers.user.id")
+                        .operator(QueryFilterOperator.EQUEAL)
+                        .value(UserUtils.getUserId(getActivity()))
+                        .build())
+                .build();
+        mCall = mApplication.getApolloClient().query(mQuery);
+        mCall.enqueue(new ApolloCall.Callback<GetReceiveMessageListQuery.Data>() {
+            @Override
+            public void onResponse(@NotNull Response<GetReceiveMessageListQuery.Data> response) {
+                getActivity().runOnUiThread(() -> {
+                    mAdapter.getList(response.data().MessageList().content());
+                    mSwipeRefreshLayout.setRefreshing(false);
+                });
+            }
+
+            @Override
+            public void onFailure(@NotNull ApolloException e) {
+                Log.d("=============: ", e.toString());
+            }
+        });
+    }
 
 }

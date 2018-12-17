@@ -1,16 +1,4 @@
 
-#测试查询
-query queryMessages{
-  MessageList{
-    content{
-      id
-      title
-      content
-    }
-    totalPages
-  }
-}
-
 #查询接收消息列表
 query getReceiveMessageList(, $qfilter: qfilter!) {
   MessageList(qfilter: $qfilter) {

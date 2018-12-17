@@ -15,12 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
         <activity
             android:name=".activity.GuidActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,14 +25,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SendActivity" />
-        <activity android:name=".activity.AddSendActivity" />
-        <activity android:name=".activity.ReceiveActivity" />
-        <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.RegisterActivity" />
-        <activity android:name=".activity.ChangePwdActivity" />
-        <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.ChangePhoneActivity"></activity>
+        <activity
+            android:name=".activity.SendActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AddSendActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ReceiveActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChangePwdActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChangePhoneActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

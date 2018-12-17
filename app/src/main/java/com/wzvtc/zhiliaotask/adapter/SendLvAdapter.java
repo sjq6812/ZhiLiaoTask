@@ -72,6 +72,7 @@ public class SendLvAdapter extends ArrayAdapter<GetReceiversByMessageIdQuery.Rec
 
     public void getList(List<GetReceiversByMessageIdQuery.Receiver> contentList) {
         mList = contentList;
+        this.notifyDataSetChanged();
     }
 
     class ViewHolder{
