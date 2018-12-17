@@ -1,0 +1,126 @@
+
+#测试查询
+query queryMessages{
+  MessageList{
+    content{
+      id
+      title
+      content
+    }
+    totalPages
+  }
+}
+
+#查询接收消息列表
+query getReceiveMessageList(, $qfilter: qfilter!) {
+  MessageList(qfilter: $qfilter) {
+    content {
+      id
+      createtime
+      sendUser {
+        id
+        nickname
+      }
+      receivers {
+        readed
+        user {
+          id
+        }
+      }
+      title
+      content
+    }
+  }
+}
+
+#查询发送消息列表
+query getSendMessageList(, $qfilter: qfilter!) {
+  MessageList(qfilter: $qfilter) {
+    content {
+      id
+      createtime
+      sendUser {
+        id
+      }
+      receivers {
+        id
+        readed
+        user {
+          id
+          nickname
+        }
+      }
+      title
+      content
+    }
+  }
+}
+
+#查询某条消息的接受者已经阅读情况
+query getReceiversByMessageId($id: String!) {
+  Message(id: $id) {
+    title
+    content
+    receivers {
+      user {
+        id
+        nickname
+      }
+      readed
+    }
+  }
+}
+
+#查询用户列表
+query getUserList {
+  UserList {
+    content {
+      id
+      phone
+      password
+      nickname
+    }
+  }
+}
+
+#设置已读
+mutation setUserReaded($messageId: String!, $userId: String!) {
+  messages_userReaded(messageId: $messageId, userId: $userId)
+}
+
+#发送消息
+mutation setMessageSend($sendUserId: String!, $receiverUserIdArr: [String]!, $title: String!, $content: String!) {
+  messages_sendMessageSimple(sendUserId: $sendUserId, receiverUserIdArr: $receiverUserIdArr, title: $title, content: $content) {
+    id
+    title
+    content
+    createtime
+  }
+}
+
+#注册用户
+mutation registerUser($user: User_!) {
+  users_registerUser(user: $user) {
+    id
+    password
+    phone
+    nickname
+  }
+}
+
+#修改密码
+mutation modifyPassword($password: String!, $id: String!) {
+  users_modifyPassword(password: $password, id: $id)
+}
+
+#修改手机
+mutation modifyPhone($phone: String!, $userId: String!) {
+  users_modifyPhone(phone: $phone, userId: $userId)
+}
+
+#修改昵称
+mutation updateUser($user: User_!) {
+  users_updateUser(user: $user) {
+    nickname
+  }
+}

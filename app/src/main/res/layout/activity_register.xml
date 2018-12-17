@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:weightSum="1">
+
+    <EditText
+        android:drawableLeft="@android:drawable/ic_menu_myplaces"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:inputType="textPersonName"
+        android:maxLength="10"
+        android:ems="10"
+        android:id="@+id/register_edit_name"
+        android:layout_alignParentTop="true"
+        android:hint="请输入您的用户名"
+        android:layout_alignLeft="@+id/change_pwd_edit_pwd"
+        android:layout_alignStart="@+id/change_pwd_edit_pwd"
+        android:layout_alignRight="@+id/change_pwd_edit_pwd"
+        android:layout_alignEnd="@+id/change_pwd_edit_pwd" />
+
+    <EditText
+        android:drawableLeft="@android:drawable/ic_lock_idle_lock"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:maxLength="11"
+        android:ems="11"
+        android:id="@+id/register_edit_phone"
+        android:hint="请输入您的手机号码"
+        android:layout_below="@+id/register_edit_name"
+        android:layout_alignRight="@+id/register_edit_name"
+        android:layout_alignEnd="@+id/register_edit_name"
+        android:layout_alignLeft="@+id/register_edit_name"
+        android:layout_alignStart="@+id/register_edit_name" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="取消"
+        android:id="@+id/register_btn_cancel"
+        android:textSize="20dp"
+        android:background="#f71818"
+        android:layout_below="@+id/register_btn_sure"
+        android:layout_alignLeft="@+id/register_btn_sure"
+        android:layout_alignStart="@+id/register_btn_sure"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:drawableLeft="@android:drawable/ic_lock_idle_lock"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:inputType="textPassword"
+        android:maxLength="16"
+        android:ems="16"
+        android:id="@+id/change_pwd_edit_pwd"
+        android:layout_below="@+id/register_edit_phone"
+        android:layout_centerHorizontal="true"
+        android:hint="请输入您的密码" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="确定"
+        android:id="@+id/register_btn_sure"
+        android:textSize="20dp"
+        android:background="#1cf718"
+        android:layout_below="@+id/change_pwd_edit_pwd"
+        android:layout_alignLeft="@+id/change_pwd_edit_pwd"
+        android:layout_alignStart="@+id/change_pwd_edit_pwd"
+        android:layout_marginTop="20dp" />
+
+</RelativeLayout>
